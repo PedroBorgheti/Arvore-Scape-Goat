@@ -1,0 +1,7 @@
+workload,chaves,n_final,tempo_ms,ns_por_operacao,checksum
+insercao_sequencial,10000,10000,3.702,370.2,0
+insercao_aleatoria,10000,6340,0.771,77.1,0
+carga_mista,10000,7137,3.330,111.0,6088
+leitura_intensiva,10000,1992,2.677,89.2,10286
+escrita_intensiva,10000,7307,4.105,136.8,11842
+zipfian_hotset,10000,10000,5.870,195.7,41842

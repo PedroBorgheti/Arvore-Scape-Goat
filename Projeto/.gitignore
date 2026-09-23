@@ -1,0 +1,6 @@
+# Executáveis gerados localmente
+benchmark
+
+# Arquivos temporários de compiladores e depuradores
+*.o
+*.dSYM/

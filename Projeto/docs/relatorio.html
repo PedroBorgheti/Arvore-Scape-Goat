@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Projeto Pratico 1 - Scapegoat Tree</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 2.5cm; color: #222; line-height: 1.35; }
+h1 { color: #17365d; text-align: center; font-size: 24pt; }
+h2 { color: #17365d; border-bottom: 1px solid #9eafc2; padding-bottom: 4px; }
+h3 { color: #365f91; }
+.authors { text-align: center; font-size: 13pt; margin-bottom: 28px; }
+table { border-collapse: collapse; width: 100%; margin: 12px 0 20px; }
+th { background: #17365d; color: white; }
+th, td { border: 1px solid #9eafc2; padding: 7px; text-align: left; }
+td:not(:first-child), th:not(:first-child) { text-align: right; }
+code, pre { font-family: Menlo, Consolas, monospace; }
+pre { background: #f2f4f7; border: 1px solid #d1d9e0; padding: 12px; }
+.note { background: #fff7df; border-left: 4px solid #d6a72c; padding: 8px 12px; }
+</style>
+</head>
+<body>
+<h1>Projeto Pratico 1 - Scapegoat Tree</h1>
+<p class="authors"><strong>Integrantes:</strong> Maisa Vendrame Kuhne, Pedro Borgheti e Vinicios Nunes</p>
+<h2>1. Objetivo</h2>
+<p>Medir o custo da Scapegoat Tree em um banco chave-valor em memoria, usando <strong>put</strong> (insercao), <strong>get</strong> (busca) e <strong>delete</strong> (remocao).</p>
+<h2>2. Metodo</h2>
+<p>O benchmark foi escrito em C e usa <code>clock_gettime(CLOCK_MONOTONIC)</code> para medir apenas as operacoes. Foram usadas <strong>N = 10.000</strong> chaves, <strong>30.000</strong> operacoes nas cargas mistas e <strong>alpha = 0,70</strong>. O gerador xorshift e a semente <code>0x12345678</code> tornam as chaves reproduziveis. O checksum evita que buscas sejam eliminadas pelo compilador.</p>
+<table><tr><th>Carga</th><th>Operacoes</th><th>Distribuicao</th></tr>
+<tr><td>Insercao sequencial</td><td>10.000 puts</td><td>Chaves 0 a 9.999</td></tr>
+<tr><td>Insercao aleatoria</td><td>10.000 puts</td><td>Chaves pseudoaleatorias</td></tr>
+<tr><td>Carga mista</td><td>30.000</td><td>50% put, 40% get, 10% delete</td></tr>
+<tr><td>Leitura intensiva</td><td>30.000</td><td>90% get, 5% put, 5% delete; preload de 10%</td></tr>
+<tr><td>Escrita intensiva</td><td>30.000</td><td>70% put, 10% get, 20% delete</td></tr>
+<tr><td>Zipfian hotset</td><td>30.000 gets</td><td>Maior concentracao nas chaves iniciais</td></tr></table>
+<h2>3. Resultados</h2>
+<p>Os valores sao uma amostra da execucao local e tambem estao registrados em <code>resultados.csv</code>. Cada linha vem diretamente da execucao do benchmark; os tempos podem variar conforme o ambiente.</p>
+<table><tr><th>Carga</th><th>Tempo (ms)</th><th>ns/op</th><th>n final</th></tr>
+<tr><td>Insercao sequencial</td><td>3,923</td><td>392,3</td><td>10.000</td></tr>
+<tr><td>Insercao aleatoria</td><td>0,790</td><td>79,0</td><td>6.340</td></tr>
+<tr><td>Carga mista</td><td>4,348</td><td>144,9</td><td>7.137</td></tr>
+<tr><td>Leitura intensiva</td><td>3,485</td><td>116,2</td><td>1.992</td></tr>
+<tr><td>Escrita intensiva</td><td>7,941</td><td>264,7</td><td>7.307</td></tr>
+<tr><td>Zipfian hotset</td><td>10,041</td><td>334,7</td><td>10.000</td></tr></table>
+<p class="note"><strong>Observacao:</strong> amostra executada localmente em macOS. Os tempos no container Linux podem variar.</p>
+<h2>4. Como reproduzir</h2>
+<h3>Container Linux</h3>
+<p>Na pasta do projeto, execute:</p>
+<pre>docker build -t scapegoat-benchmark .
+docker run --rm scapegoat-benchmark &gt; resultados.csv</pre>
+<p>O <code>Dockerfile</code> usa a imagem <code>gcc:13</code>, compila com <code>-O2</code> e executa o benchmark dentro de Linux.</p>
+<h3>Sem container</h3>
+<pre>sh run.sh</pre>
+<h2>5. Origem dos dados</h2>
+<p>Os dados sao produzidos pelo proprio programa <code>main.c</code>, sem fonte externa. As regras das cargas foram retiradas do enunciado do Projeto Pratico 1 - Arvores Balanceadas, UTFPR, periodo 2026.2. A implementacao da Scapegoat Tree esta em <code>ScapegoatTree.c</code> e <code>ScapegoatTree.h</code>. O arquivo <code>resultados.csv</code> e o registro bruto da execucao.</p>
+<h2>6. Conclusao</h2>
+<p>A insercao sequencial testa o caso de maior estresse estrutural. As cargas mistas mostram o comportamento geral do banco, enquanto leitura e escrita intensivas isolam perfis de uso diferentes. Nesta amostra, a leitura intensiva apresentou menor custo medio por operacao, enquanto a escrita intensiva foi mais custosa por envolver mais alteracoes estruturais. Os resultados devem ser comparados no mesmo ambiente, pois CPU, compilador e carga do sistema alteram os tempos.</p>
+</body>
+</html>

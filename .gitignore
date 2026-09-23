@@ -50,3 +50,9 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Metadados do macOS
+.DS_Store
+
+# Ambiente virtual usado para gerar o relatório Word
+.venv/
